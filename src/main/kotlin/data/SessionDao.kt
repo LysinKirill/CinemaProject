@@ -3,8 +3,8 @@ package data
 import domain.entitiy.SessionEntity
 
 interface SessionDao {
-    fun add(session: SessionEntity)
-    fun get(sessionId: Int) : SessionEntity?
-    fun getAll() : List<SessionEntity>
-    fun update(vararg listAccount: SessionEntity)
+    fun addSession(session: SessionEntity)
+    fun getSession(sessionId: Int) : SessionEntity?
+    fun getAllSession() : List<SessionEntity>
+    fun updateWithSessions(vararg listAccount: SessionEntity)
 }
