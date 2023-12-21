@@ -1,6 +1,6 @@
 package domain.entitiy
 
-enum class SeatStateEntity {
+enum class SeatState {
     Available,
     Sold,
     Occupied

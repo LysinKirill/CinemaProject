@@ -4,9 +4,9 @@ import kotlinx.datetime.LocalDateTime
 
 
 data class SessionEntity(
+    val sessionId: Int,
     val filmId: Int,
     val startTime: LocalDateTime,
-    val soldTicketIds: List<Int> = listOf(),
-    val occupiedSeats: List<List<SeatStateEntity>>
-) {
-}
+    val soldTicketIds: Set<Int>,
+    val seats: List<List<SeatState>>
+)
