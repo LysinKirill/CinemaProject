@@ -60,4 +60,29 @@ class SessionControllerImpl(private val sessionDao: SessionDao) : SessionControl
             "Occupied seats for the session with Id $sessionId\n"
                     + occupiedSeats.joinToString { (rowNumber, row) -> "Row number $rowNumber: $row" })
     }
+
+    override fun markOccupiedSeat(sessionId: Int, seatRow: Int, seatNumber: Int): OutputModel {
+        val session = sessionDao.getSession(sessionId) ?: return OutputModel("Session with Id = $sessionId not found")
+
+        if (seatRow < 1 || seatRow > session.seats.size)
+            return OutputModel("Incorrect row chosen [$seatRow]. The number of rows in this session = ${session.seats.size}")
+
+        if (seatNumber < 1 || seatNumber > session.seats[seatRow - 1].size)
+            return OutputModel("Incorrect seat number chosen [$seatNumber]. The number of seats in the row number $seatRow in this session = ${session.seats[seatRow - 1].size}")
+
+        if(session.seats[seatRow][seatNumber] == SeatState.Occupied)
+            return OutputModel("The seat is already marked as occupied")
+
+
+        val updatedSeatState = mutableListOf<MutableList<SeatState>>()
+        for(i in session.seats.indices)
+            updatedSeatState.add(session.seats[i].toMutableList())
+
+        updatedSeatState[seatRow][seatNumber] = SeatState.Occupied
+
+        val updatedSession = session.copy(seats = updatedSeatState)
+        sessionDao.updateWithSessions(updatedSession)
+
+        return OutputModel("The seat has been successfully marked as occupied")
+    }
 }
