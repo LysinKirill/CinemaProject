@@ -5,12 +5,11 @@ import domain.entitiy.FilmInfoEntity
 import presentation.model.OutputModel
 
 class FilmControllerImpl(private val filmDao: FilmDao) : FilmController {
-    override fun addFilmInfo(filmInfo: FilmInfoEntity): OutputModel {
-        if(filmDao.getFilm(filmInfo.filmId) != null)
-            return OutputModel("Film with id ${filmInfo.filmId} already exists")
-
-        filmDao.addFilm(filmInfo)
-        return OutputModel("Film with id ${filmInfo.filmId} have been added")
+    override fun addFilmInfo(filmName: String, duration: Int): OutputModel {
+        val newFilmId = (filmDao.getAllFilms().maxOfOrNull { film -> film.filmId } ?: 0) + 1
+        val newFilm = FilmInfoEntity(filmId = newFilmId, name = filmName, durationInMinutes = duration)
+        filmDao.addFilm(newFilm)
+        return OutputModel("Film with id $newFilmId have been added")
     }
 
     override fun editFilmName(filmId: Int, newName: String): OutputModel {
