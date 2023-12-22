@@ -21,16 +21,13 @@ class ConsoleMenuManager(
     }
 
     override fun processRequest(request: MenuOption?) {
-
-        //val menuOption: MenuOption? = request?.let { parseAction(it) }
-
-
         when (request) {
             MenuOption.SellTicket -> sellTicket(getSessionId())
             MenuOption.ReturnTicket -> returnTicket(getSessionId())
             MenuOption.ShowAvailableSeats -> showAvailableSeats(getSessionId())
-            MenuOption.AddFilmInfo -> TODO()
-            MenuOption.EditFilmInfo -> TODO()
+            MenuOption.AddFilmInfo -> addFilmInfo()
+            MenuOption.EditFilmName -> editFilmName(getFilmId())
+            MenuOption.EditFilmDuration -> editFilmDuration(getFilmId())
             MenuOption.EditSessionStartTime -> editSessionStartTime(getSessionId())
             MenuOption.EditSessionFilm -> editSessionFilm(getSessionId())
             MenuOption.MarkOccupiedSeat -> markOccupiedSeat(getSessionId())
@@ -59,6 +56,54 @@ class ConsoleMenuManager(
         }
     }
 
+    private fun editFilmDuration(filmId: Int?) {
+        if(filmId == null) {
+            println("Incorrect film Id")
+            return
+        }
+
+        print("Input the new duration of the film: ")
+        val duration = getIntegerFromUser()
+        if(duration == null) {
+            println("Incorrect film name")
+            return
+        }
+
+        println(filmController.editFilmDuration(filmId, duration))
+    }
+    private fun editFilmName(filmId: Int?) {
+        if(filmId == null) {
+            println("Incorrect film Id")
+            return
+        }
+
+        print("Input the new name of the film: ")
+        val filmName = readlnOrNull()
+        if(filmName == null) {
+            println("Incorrect film name")
+            return
+        }
+
+        println(filmController.editFilmName(filmId, filmName))
+    }
+
+    private fun addFilmInfo() {
+        print("Input the name of the film: ")
+        val filmName = readlnOrNull()
+        if(filmName == null) {
+            println("Incorrect film name")
+            return
+        }
+
+        print("Input the duration of the film: ")
+        val filmDuration = getIntegerFromUser()
+        if(filmDuration == null || filmDuration <= 0) {
+            println("Incorrect film duration")
+            return
+        }
+
+        println(filmController.addFilmInfo(filmName, filmDuration))
+    }
     private fun returnTicket(sessionId: Int?) {
         if (sessionId == null) {
             println("Incorrect session Id")
@@ -164,6 +209,11 @@ class ConsoleMenuManager(
 
     private fun getSessionId(): Int? {
         print("Input the Id of the session: ")
+        return getIntegerFromUser()
+    }
+
+    private fun getFilmId() : Int? {
+        print("Input the Id of the film: ")
         return getIntegerFromUser()
     }
 
