@@ -1,5 +1,6 @@
 package domain.entitiy
 
-data class FilmInfoEntity(val name: String, val length: Int) {
-
-}
+data class FilmInfoEntity(
+    val filmId: Int,
+    val name: String,
+    val durationInMinutes: Int)
