@@ -11,6 +11,5 @@ interface SessionController {
     fun editFilmId(sessionId: Int, newFilmId: Int) : OutputModel
     fun getAvailableSeats(sessionId: Int) : OutputModel
     fun getOccupiedSeats(sessionId: Int) : OutputModel
-    fun revokeTicket(sessionId: Int, ticketId: Int) : OutputModel
 
 }

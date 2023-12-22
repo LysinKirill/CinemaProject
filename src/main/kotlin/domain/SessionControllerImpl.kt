@@ -60,23 +60,4 @@ class SessionControllerImpl(private val sessionDao: SessionDao) : SessionControl
             "Occupied seats for the session with Id $sessionId\n"
                     + occupiedSeats.joinToString { (rowNumber, row) -> "Row number $rowNumber: $row" })
     }
-
-    override fun revokeTicket(sessionId: Int, ticketId: Int): OutputModel {
-        val session = sessionDao.getSession(sessionId) ?: return OutputModel("Session with Id = $sessionId not found")
-        if(!session.soldTicketIds.contains(ticketId))
-            return OutputModel("Ticket with ticketId = $ticketId has not been sold for the session with Id = $sessionId")
-
-
-        sessionDao.updateWithSessions(
-            session.copy(
-                sessionId = session.sessionId,
-                filmId = session.filmId,
-                startTime = session.startTime,
-                soldTicketIds = session.soldTicketIds.minus(ticketId),
-                seats = session.seats
-            )
-        )
-        return OutputModel("Ticket with Id = $ticketId successfully revoked")
-    }
-
 }
