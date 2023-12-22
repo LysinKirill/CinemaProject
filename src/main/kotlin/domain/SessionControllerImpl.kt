@@ -2,25 +2,29 @@ package domain
 
 import data.SessionDao
 import domain.entitiy.SeatState
+import domain.entitiy.SessionEntity
 import kotlinx.datetime.LocalDateTime
 import presentation.model.OutputModel
 
 class SessionControllerImpl(private val sessionDao: SessionDao) : SessionController {
+    override fun addSession(filmId: Int, startTime: LocalDateTime, seats: List<List<SeatState>>) : OutputModel {
+        val newSessionId = (sessionDao.getAllSession().maxOfOrNull { session -> session.sessionId } ?: 0) + 1
+        val newSession = SessionEntity(newSessionId, filmId, startTime, setOf(), seats)
+        sessionDao.addSession(newSession)
+        return OutputModel("Session with id = $newSessionId was created")
+    }
+
     override fun editSessionStartTime(sessionId: Int, newStartTime: LocalDateTime): OutputModel {
-        TODO("Not yet implemented")
+        val session = sessionDao.getSession(sessionId) ?: return OutputModel("Session with Id = $sessionId not found")
+        val updatedSession = session.copy(startTime = newStartTime)
+        sessionDao.updateWithSessions(updatedSession)
+        return OutputModel("Session with Id = $sessionId updated with start time = $newStartTime")
     }
 
     override fun editFilmId(sessionId: Int, newFilmId: Int): OutputModel {
         val session = sessionDao.getSession(sessionId) ?: return OutputModel("Session with Id = $sessionId not found")
-        sessionDao.updateWithSessions(
-            session.copy(
-                sessionId = session.sessionId,
-                filmId = newFilmId,
-                startTime = session.startTime,
-                soldTicketIds = session.soldTicketIds,
-                seats = session.seats
-            )
-        )
+        val updatedSession = session.copy(filmId = newFilmId)
+        sessionDao.updateWithSessions(updatedSession)
         return OutputModel("Session with Id = $sessionId updated with filmId = $newFilmId")
     }
 
