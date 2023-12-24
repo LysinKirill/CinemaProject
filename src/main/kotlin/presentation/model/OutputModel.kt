@@ -1,6 +1,9 @@
 package presentation.model
 
-@JvmInline
-value class OutputModel(
-    val message: String,
-)
+data class OutputModel(
+    private val message: String,
+) {
+    override fun toString(): String {
+        return message
+    }
+}

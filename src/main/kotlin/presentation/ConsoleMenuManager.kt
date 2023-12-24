@@ -1,12 +1,16 @@
 package presentation
 
+import di.DI
 import domain.FilmController
 import domain.SessionController
 import domain.TicketService
 import kotlinx.datetime.LocalDateTime
-import java.lang.Exception
+import kotlin.Exception
 
 class ConsoleMenuManager(
+    //private val filmDao: FilmDao,
+    //private val sessionDao: SessionDao,
+    //private val ticketDao: TicketDao,
     private val filmController: FilmController,
     private val sessionController: SessionController,
     private val ticketService: TicketService
@@ -31,13 +35,15 @@ class ConsoleMenuManager(
             MenuOption.EditSessionStartTime -> editSessionStartTime(getSessionId())
             MenuOption.EditSessionFilm -> editSessionFilm(getSessionId())
             MenuOption.MarkOccupiedSeat -> markOccupiedSeat(getSessionId())
+            MenuOption.CreateSession -> createSession()
             MenuOption.Exit -> return
-            else -> TODO()
+            else -> println("Unhandled option...")
         }
     }
 
     override fun handleInteractions() {
         do {
+            showOptions()
             val request = getRequest()
             processRequest(request)
 
@@ -56,16 +62,33 @@ class ConsoleMenuManager(
         }
     }
 
+    private fun createSession() {
+        val filmId = getFilmId()
+        if(filmId == null) {
+            println("Incorrect film Id")
+            return
+        }
+
+        //if(filmDao.getAllFilms().none { film -> film.filmId == filmId }) {}
+
+        val filmStartTime = getLocalDateTimeFromUser()
+        if(filmStartTime == null) {
+            println("Incorrect date or time of start")
+            return
+        }
+
+        println(sessionController.addSession(filmId, filmStartTime, DI.cinemaHallSeats))
+    }
     private fun editFilmDuration(filmId: Int?) {
         if(filmId == null) {
             println("Incorrect film Id")
             return
         }
 
-        print("Input the new duration of the film: ")
+        print("Input the new duration of the film in minutes: ")
         val duration = getIntegerFromUser()
         if(duration == null) {
-            println("Incorrect film name")
+            println("Incorrect film duration")
             return
         }
 
@@ -84,6 +107,11 @@ class ConsoleMenuManager(
             return
         }
 
+        if(filmName.isBlank()) {
+            println("Film name cannot be empty")
+            return
+        }
+
         println(filmController.editFilmName(filmId, filmName))
     }
 
@@ -95,7 +123,12 @@ class ConsoleMenuManager(
             return
         }
 
-        print("Input the duration of the film: ")
+        if(filmName.isBlank()) {
+            println("Film name cannot be empty")
+            return
+        }
+
+        print("Input the duration of the film  in minutes: ")
         val filmDuration = getIntegerFromUser()
         if(filmDuration == null || filmDuration <= 0) {
             println("Incorrect film duration")
@@ -110,7 +143,7 @@ class ConsoleMenuManager(
             return
         }
 
-        print("Input the Id of the ticket:")
+        print("Input the Id of the ticket: ")
         val ticketId = getIntegerFromUser()
         if(ticketId == null) {
             println("Incorrect ticket Id")
@@ -125,7 +158,7 @@ class ConsoleMenuManager(
             return
         }
 
-        print("Input the price of the ticket:")
+        print("Input the price of the ticket: ")
         val ticketPrice = getIntegerFromUser()
         if(ticketPrice == null || ticketPrice <= 0) {
             println("Incorrect ticket price")
@@ -133,10 +166,10 @@ class ConsoleMenuManager(
             return
         }
 
-        print("Input the number of the row:")
+        print("Input the number of the row: ")
         val rowNumber = getIntegerFromUser()
 
-        print("Input the seat number:")
+        print("Input the seat number: ")
         val seatNumber = getIntegerFromUser()
 
         if (rowNumber == null || seatNumber == null) {
@@ -153,10 +186,10 @@ class ConsoleMenuManager(
             return
         }
 
-        print("Input the number of the row:")
+        print("Input the number of the row: ")
         val rowNumber = getIntegerFromUser()
 
-        print("Input the seat number:")
+        print("Input the seat number: ")
         val seatNumber = getIntegerFromUser()
 
         if (rowNumber == null || seatNumber == null) {
@@ -174,7 +207,7 @@ class ConsoleMenuManager(
         }
 
         print("Input the new start time of the session: ")
-        val newStartTime = getLocalTimeFromUser()
+        val newStartTime = getLocalDateTimeFromUser()
 
         if (newStartTime == null) {
             println("Incorrect format of time provided")
@@ -218,11 +251,30 @@ class ConsoleMenuManager(
     }
 
     private fun getIntegerFromUser(): Int? {
-        return readlnOrNull()?.toInt()
+        return try {
+            readlnOrNull()?.toInt()
+        } catch (formatException: NumberFormatException) {
+            null
+        }
     }
 
-    private fun getLocalTimeFromUser(): LocalDateTime? {
-        print("Input the local time in the following format (HH:MM:SS): ")
-        return readlnOrNull()?.let { LocalDateTime.parse(it) }
+    private fun getLocalDateTimeFromUser(): LocalDateTime? {
+        print("Input the local date time in the following format (dd.mm.yyyy HH:MM): ")
+        val timeString = readlnOrNull() ?: return null
+        return try {
+            val (datePart, timePart) = timeString.split(" ")
+            val (day, month, year) = datePart.split(".").map { s -> s.toInt() }
+            val (hours, minutes) = timePart.split(":").map { s -> s.toInt() }
+            //LocalDateTime.parse(timeString)
+            LocalDateTime(
+                year = year,
+                monthNumber = month,
+                dayOfMonth = day,
+                hour = hours,
+                minute = minutes
+            )
+        } catch (ex: Exception) {
+            null
+        }
     }
 }

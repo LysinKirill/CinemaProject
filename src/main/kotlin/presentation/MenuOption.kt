@@ -1,14 +1,15 @@
 package presentation
 
 enum class MenuOption {
-    SellTicket,
-    ReturnTicket,
-    ShowAvailableSeats,
     AddFilmInfo,
     EditFilmName,
     EditFilmDuration,
+    CreateSession,
+    ShowAvailableSeats,
+    MarkOccupiedSeat,
     EditSessionStartTime,
     EditSessionFilm,
-    MarkOccupiedSeat,
+    SellTicket,
+    ReturnTicket,
     Exit
 }

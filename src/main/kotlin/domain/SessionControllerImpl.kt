@@ -1,13 +1,16 @@
 package domain
 
+import data.FilmDao
 import data.SessionDao
 import domain.entitiy.SeatState
 import domain.entitiy.SessionEntity
 import kotlinx.datetime.LocalDateTime
 import presentation.model.OutputModel
 
-class SessionControllerImpl(private val sessionDao: SessionDao) : SessionController {
-    override fun addSession(filmId: Int, startTime: LocalDateTime, seats: List<List<SeatState>>) : OutputModel {
+class SessionControllerImpl(private val sessionDao: SessionDao, private val filmDao: FilmDao) : SessionController {
+    override fun addSession(filmId: Int, startTime: LocalDateTime, seats: List<List<SeatState>>): OutputModel {
+        if(filmDao.getAllFilms().none { film -> film.filmId == filmId })
+            return OutputModel("Cannot find film with Id = $filmId")
         val newSessionId = (sessionDao.getAllSession().maxOfOrNull { session -> session.sessionId } ?: 0) + 1
         val newSession = SessionEntity(newSessionId, filmId, startTime, setOf(), seats)
         sessionDao.addSession(newSession)
@@ -23,6 +26,8 @@ class SessionControllerImpl(private val sessionDao: SessionDao) : SessionControl
 
     override fun editFilmId(sessionId: Int, newFilmId: Int): OutputModel {
         val session = sessionDao.getSession(sessionId) ?: return OutputModel("Session with Id = $sessionId not found")
+        if(filmDao.getAllFilms().none { film -> film.filmId == newFilmId })
+            return OutputModel("Cannot find film with Id = $newFilmId")
         val updatedSession = session.copy(filmId = newFilmId)
         sessionDao.updateWithSessions(updatedSession)
         return OutputModel("Session with Id = $sessionId updated with filmId = $newFilmId")
@@ -39,11 +44,19 @@ class SessionControllerImpl(private val sessionDao: SessionDao) : SessionControl
                     availableSeats[i].add(j)
         }
 
-        return if (availableSeats.isEmpty())
+        return if (availableSeats.isEmpty() || availableSeats.sumOf{list -> list.size} == 0)
             OutputModel("All the seats are booked")
-        else OutputModel(
-            "Available seats for the session with Id = $sessionId\n"
-                    + availableSeats.joinToString { (rowNumber, row) -> "Row number $rowNumber: $row" })
+        else {
+            val stringBuilder = StringBuilder()
+            stringBuilder.append("Available seats for the session with Id $sessionId\n")
+            for(i in availableSeats.indices) {
+                if(availableSeats[i].isEmpty() || availableSeats.sumOf { list -> list.size } == 0)
+                    stringBuilder.append("No seats available in row number ${i + 1}\n")
+                else
+                    stringBuilder.append("Available seats in row number ${i + 1}: " + availableSeats[i].joinToString(separator = " ", prefix = "[", postfix = "]\n"){el -> (el + 1).toString()})
+            }
+            return OutputModel(stringBuilder.toString())
+        }
 
     }
 
@@ -58,11 +71,19 @@ class SessionControllerImpl(private val sessionDao: SessionDao) : SessionControl
                     occupiedSeats[i].add(j)
         }
 
-        return if (occupiedSeats.isEmpty())
+        return if (occupiedSeats.isEmpty()  || occupiedSeats.sumOf{list -> list.size} == 0)
             OutputModel("None of the seats for the session with Id = $sessionId are occupied")
-        else OutputModel(
-            "Occupied seats for the session with Id $sessionId\n"
-                    + occupiedSeats.joinToString { (rowNumber, row) -> "Row number $rowNumber: $row" })
+        else {
+            val stringBuilder = StringBuilder()
+            stringBuilder.append("Occupied seats for the session with Id $sessionId\n")
+            for(i in occupiedSeats.indices) {
+                if(occupiedSeats[i].isEmpty())
+                    stringBuilder.append("No occupied seats in row number ${i + 1}\n")
+                else
+                    stringBuilder.append("Occupied seats in row number ${i + 1}: " + occupiedSeats[i].joinToString(separator = " ", prefix = "[", postfix = "]\n"){el -> (el + 1).toString()})
+            }
+            return OutputModel(stringBuilder.toString())
+        }
     }
 
     override fun markOccupiedSeat(sessionId: Int, seatRow: Int, seatNumber: Int): OutputModel {
@@ -74,12 +95,14 @@ class SessionControllerImpl(private val sessionDao: SessionDao) : SessionControl
         if (seatNumber < 1 || seatNumber > session.seats[seatRow - 1].size)
             return OutputModel("Incorrect seat number chosen [$seatNumber]. The number of seats in the row number $seatRow in this session = ${session.seats[seatRow - 1].size}")
 
-        if(session.seats[seatRow][seatNumber] == SeatState.Occupied)
+        if (session.seats[seatRow - 1][seatNumber - 1] == SeatState.Occupied)
             return OutputModel("The seat is already marked as occupied")
 
+        if (session.seats[seatRow - 1][seatNumber - 1] == SeatState.Available)
+            return OutputModel("Cannot mark the seat which have not been sold as occupied")
 
         val updatedSeatState = mutableListOf<MutableList<SeatState>>()
-        for(i in session.seats.indices)
+        for (i in session.seats.indices)
             updatedSeatState.add(session.seats[i].toMutableList())
 
         updatedSeatState[seatRow][seatNumber] = SeatState.Occupied

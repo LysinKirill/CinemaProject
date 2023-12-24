@@ -23,7 +23,7 @@ class TicketServiceImpl(
             return OutputModel("The chosen seat has already been sold")
 
 
-        val newTicketId = session.soldTicketIds.max() + 1
+        val newTicketId = (session.soldTicketIds.maxOrNull() ?: 0) + 1
         val newTicket = TicketEntity(
             ticketId = newTicketId,
             row = row - 1,
@@ -35,7 +35,7 @@ class TicketServiceImpl(
         val updatedSeatState = mutableListOf<MutableList<SeatState>>()
         for(i in session.seats.indices)
             updatedSeatState.add(session.seats[i].toMutableList())
-        updatedSeatState[row][seatNumber] = SeatState.Sold
+        updatedSeatState[row - 1][seatNumber - 1] = SeatState.Sold
 
         val updatedSession = session.copy(soldTicketIds = session.soldTicketIds.plus(newTicketId), seats = updatedSeatState)
 
