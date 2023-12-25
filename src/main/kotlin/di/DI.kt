@@ -9,10 +9,11 @@ import presentation.MenuManager
 object DI {
     private const val CINEMA_ROW_COUNT = 10
     private const val ROW_SEAT_COUNT = 12
-
+    private const val SESSION_STORAGE_PATH = "src/main/resources/session_storage.json"
 
     private val sessionDao: SessionDao by lazy {
-        RuntimeSessionDao()
+        //RuntimeSessionDao()
+        JsonSessionStorage(SESSION_STORAGE_PATH)
     }
 
     private val filmDao: FilmDao by lazy {

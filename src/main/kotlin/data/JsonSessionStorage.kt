@@ -10,7 +10,8 @@ import java.io.FileNotFoundException
 class JsonSessionStorage(private val jsonStoragePath: String) : SessionDao {
     override fun addSession(session: SessionEntity) {
         val storageFileText = readFileOrCreateEmpty(jsonStoragePath)
-        val storedSessions: List<SessionEntity> = Json.decodeFromString(storageFileText)
+        val storedSessions: List<SessionEntity> =
+            if (storageFileText.isBlank()) listOf() else Json.decodeFromString(storageFileText)
         val updatedSessions = storedSessions.toMutableList()
 
         updatedSessions.add(session)
@@ -20,27 +21,30 @@ class JsonSessionStorage(private val jsonStoragePath: String) : SessionDao {
 
     override fun getSession(sessionId: Int): SessionEntity? {
         val storageFileText = readFileOrCreateEmpty(jsonStoragePath)
-        val storedSessions: List<SessionEntity> = Json.decodeFromString(storageFileText)
+        val storedSessions: List<SessionEntity> =
+            if (storageFileText.isBlank()) listOf() else Json.decodeFromString(storageFileText)
 
         return storedSessions.getOrNull(sessionId)
     }
 
     override fun getAllSession(): List<SessionEntity> {
         val storageFileText = readFileOrCreateEmpty(jsonStoragePath)
-        val storedSessions: List<SessionEntity> = Json.decodeFromString(storageFileText)
+        val storedSessions: List<SessionEntity> =
+            if (storageFileText.isBlank()) listOf() else Json.decodeFromString(storageFileText)
 
         return storedSessions
     }
 
     override fun updateWithSessions(vararg listAccount: SessionEntity) {
         val storageFileText = readFileOrCreateEmpty(jsonStoragePath)
-        val storedSessions: List<SessionEntity> = Json.decodeFromString(storageFileText)
+        val storedSessions: List<SessionEntity> =
+            if (storageFileText.isBlank()) listOf() else Json.decodeFromString(storageFileText)
         val updatedSessions = storedSessions.toMutableList()
 
-        for(session in listAccount) {
+        for (session in listAccount) {
 
             // should I subtract 1 from sessionId
-            if(session.sessionId > updatedSessions.size){
+            if (session.sessionId > updatedSessions.size) {
                 // id check?
                 updatedSessions.add(session)
             } else {
@@ -51,12 +55,13 @@ class JsonSessionStorage(private val jsonStoragePath: String) : SessionDao {
         writeTextToFile(jsonStoragePath, serializedUpdatedStorage)
     }
 
-    private fun readFileOrCreateEmpty(filePath : String) : String {
+    private fun readFileOrCreateEmpty(filePath: String): String {
         val file = File(filePath)
         try {
             return file.readText()
-        } catch(exception: FileNotFoundException) {
-            file.writeText("")
+        } catch (exception: FileNotFoundException) {
+            file.createNewFile()
+            //file.writeText("")
             return ""
         }
     }
