@@ -10,6 +10,8 @@ object DI {
     private const val CINEMA_ROW_COUNT = 10
     private const val ROW_SEAT_COUNT = 12
     private const val SESSION_STORAGE_PATH = "src/main/resources/session_storage.json"
+    private const val FILM_STORAGE_PATH = "src/main/resources/film_storage.json"
+    private const val TICKET_STORAGE_PATH = "src/main/resources/ticket_storage.json"
 
     private val sessionDao: SessionDao by lazy {
         //RuntimeSessionDao()
@@ -17,14 +19,16 @@ object DI {
     }
 
     private val filmDao: FilmDao by lazy {
-        RuntimeFilmDao()
+        JsonFilmStorage(FILM_STORAGE_PATH)
+        //RuntimeFilmDao()
     }
 
     private val ticketDao : TicketDao by lazy {
-        RuntimeTicketDao()
+        //RuntimeTicketDao()
+        JsonTicketStorage(TICKET_STORAGE_PATH)
     }
     val sessionController : SessionController
-        get() = SessionControllerImpl(sessionDao, filmDao)
+        get() = SessionControllerImpl(sessionDao, filmDao, ticketDao)
 
     val filmController : FilmController
         get() = FilmControllerImpl(filmDao)

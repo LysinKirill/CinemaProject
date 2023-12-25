@@ -2,6 +2,7 @@ package domain
 
 import data.FilmDao
 import domain.entitiy.FilmInfoEntity
+import domain.entitiy.TicketEntity
 import presentation.model.OutputModel
 
 class FilmControllerImpl(private val filmDao: FilmDao) : FilmController {
@@ -28,5 +29,14 @@ class FilmControllerImpl(private val filmDao: FilmDao) : FilmController {
 
         filmDao.updateFilm(film.copy(durationInMinutes = newDurationInMinutes))
         return OutputModel("Updated duration to $newDurationInMinutes minutes for film with Id = $filmId")
+    }
+
+    override fun getAllFilms(): OutputModel {
+        val films = filmDao.getAllFilms()
+
+        if(films.isEmpty())
+            return OutputModel("")
+        return OutputModel("List of all films:\n" +
+                films.joinToString("\n") { film -> "\tFilm with id = ${film.filmId}: (film title = ${film.name}, duration = ${film.durationInMinutes} minutes)"})
     }
 }

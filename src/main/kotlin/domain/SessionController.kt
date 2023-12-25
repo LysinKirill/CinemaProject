@@ -12,5 +12,6 @@ interface SessionController {
     fun getAvailableSeats(sessionId: Int) : OutputModel
     fun getOccupiedSeats(sessionId: Int) : OutputModel
     fun markOccupiedSeat(sessionId: Int, seatRow: Int, seatNumber: Int) : OutputModel
-
+    fun getAllTickets(sessionId: Int) : OutputModel
+    fun getAllSessions() : OutputModel
 }

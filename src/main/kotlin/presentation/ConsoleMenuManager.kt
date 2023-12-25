@@ -5,12 +5,10 @@ import domain.FilmController
 import domain.SessionController
 import domain.TicketService
 import kotlinx.datetime.LocalDateTime
+import presentation.model.OutputModel
 import kotlin.Exception
 
 class ConsoleMenuManager(
-    //private val filmDao: FilmDao,
-    //private val sessionDao: SessionDao,
-    //private val ticketDao: TicketDao,
     private val filmController: FilmController,
     private val sessionController: SessionController,
     private val ticketService: TicketService
@@ -26,15 +24,15 @@ class ConsoleMenuManager(
 
     override fun processRequest(request: MenuOption?) {
         when (request) {
-            MenuOption.SellTicket -> sellTicket(getSessionId())
-            MenuOption.ReturnTicket -> returnTicket(getSessionId())
-            MenuOption.ShowAvailableSeats -> showAvailableSeats(getSessionId())
+            MenuOption.SellTicket -> sellTicket()
+            MenuOption.ReturnTicket -> returnTicket()
+            MenuOption.ShowAvailableSeats -> showAvailableSeats()
             MenuOption.AddFilmInfo -> addFilmInfo()
-            MenuOption.EditFilmName -> editFilmName(getFilmId())
-            MenuOption.EditFilmDuration -> editFilmDuration(getFilmId())
-            MenuOption.EditSessionStartTime -> editSessionStartTime(getSessionId())
-            MenuOption.EditSessionFilm -> editSessionFilm(getSessionId())
-            MenuOption.MarkOccupiedSeat -> markOccupiedSeat(getSessionId())
+            MenuOption.EditFilmName -> editFilmName()
+            MenuOption.EditFilmDuration -> editFilmDuration()
+            MenuOption.EditSessionStartTime -> editSessionStartTime()
+            MenuOption.EditSessionFilm -> editFilmName()
+            MenuOption.MarkOccupiedSeat -> markOccupiedSeat()
             MenuOption.CreateSession -> createSession()
             MenuOption.Exit -> return
             else -> println("Unhandled option...")
@@ -63,13 +61,21 @@ class ConsoleMenuManager(
     }
 
     private fun createSession() {
+        val allFilmsString = filmController.getAllFilms()
+
+        if(allFilmsString.message.isBlank()) {
+            println("There is no information of saved films")
+            return
+        }
+        println(allFilmsString)
+
         val filmId = getFilmId()
         if(filmId == null) {
             println("Incorrect film Id")
             return
         }
 
-        //if(filmDao.getAllFilms().none { film -> film.filmId == filmId }) {}
+
 
         val filmStartTime = getLocalDateTimeFromUser()
         if(filmStartTime == null) {
@@ -79,11 +85,23 @@ class ConsoleMenuManager(
 
         println(sessionController.addSession(filmId, filmStartTime, DI.cinemaHallSeats))
     }
-    private fun editFilmDuration(filmId: Int?) {
+    private fun editFilmDuration() {
+        val allFilmsString = filmController.getAllFilms()
+
+        if(allFilmsString.message.isBlank()) {
+            println("There is no information of saved films")
+            return
+        }
+        println(allFilmsString)
+
+        val filmId = getFilmId()
+
         if(filmId == null) {
             println("Incorrect film Id")
             return
         }
+
+
 
         print("Input the new duration of the film in minutes: ")
         val duration = getIntegerFromUser()
@@ -94,11 +112,19 @@ class ConsoleMenuManager(
 
         println(filmController.editFilmDuration(filmId, duration))
     }
-    private fun editFilmName(filmId: Int?) {
+    private fun editFilmName() {
+        println("Available films:")
+        if(!showAllFilms())
+            return
+
+        val filmId = getFilmId()
+
+
         if(filmId == null) {
             println("Incorrect film Id")
             return
         }
+
 
         print("Input the new name of the film: ")
         val filmName = readlnOrNull()
@@ -137,11 +163,21 @@ class ConsoleMenuManager(
 
         println(filmController.addFilmInfo(filmName, filmDuration))
     }
-    private fun returnTicket(sessionId: Int?) {
+    private fun returnTicket() {
+        println("Current sessions:")
+        if(!showAllSessions())
+            return
+
+        val sessionId = getSessionId()
         if (sessionId == null) {
             println("Incorrect session Id")
             return
         }
+
+        println("Sold tickets:")
+        if(!showAllTickets(sessionId))
+            return
+
 
         print("Input the Id of the ticket: ")
         val ticketId = getIntegerFromUser()
@@ -152,13 +188,20 @@ class ConsoleMenuManager(
 
         println(ticketService.revokeTicket(sessionId, ticketId))
     }
-    private fun sellTicket(sessionId: Int?) {
+    private fun sellTicket() {
+        println("Current sessions:")
+        if(!showAllSessions())
+            return
+
+        val sessionId = getSessionId()
+
         if (sessionId == null) {
             println("Incorrect session Id")
             return
         }
 
         print("Input the price of the ticket: ")
+
         val ticketPrice = getIntegerFromUser()
         if(ticketPrice == null || ticketPrice <= 0) {
             println("Incorrect ticket price")
@@ -180,11 +223,21 @@ class ConsoleMenuManager(
         println(ticketService.sellTicket(sessionId, ticketPrice, rowNumber, seatNumber))
     }
 
-    private fun markOccupiedSeat(sessionId: Int?) {
+    private fun markOccupiedSeat() {
+        println("Current sessions:")
+        if(!showAllSessions())
+            return
+
+        val sessionId = getSessionId()
         if (sessionId == null) {
             println("Incorrect session Id")
             return
         }
+
+        println("Sold tickets:")
+        if(!showAllTickets(sessionId))
+            return
+
 
         print("Input the number of the row: ")
         val rowNumber = getIntegerFromUser()
@@ -200,7 +253,12 @@ class ConsoleMenuManager(
         println(sessionController.markOccupiedSeat(sessionId, rowNumber, seatNumber))
     }
 
-    private fun editSessionStartTime(sessionId: Int?) {
+    private fun editSessionStartTime() {
+        println("Current sessions:")
+        if(!showAllSessions())
+            return
+
+        val sessionId = getSessionId()
         if (sessionId == null) {
             println("Incorrect session Id")
             return
@@ -216,23 +274,34 @@ class ConsoleMenuManager(
         println(sessionController.editSessionStartTime(sessionId, newStartTime))
     }
 
-    private fun editSessionFilm(sessionId: Int?) {
-        if (sessionId == null) {
-            println("Incorrect session Id")
+//    private fun editSessionFilm() {
+//        println("Current sessions:")
+//        if(!showAllSessions())
+//            return
+//
+//        val sessionId = getSessionId()
+//        if (sessionId == null) {
+//            println("Incorrect session Id")
+//            return
+//        }
+//
+//        print("Input the Id of the new film: ")
+//        val newFilmId = getIntegerFromUser()
+//
+//        if (newFilmId == null) {
+//            println("Incorrect format of Id provided")
+//            return
+//        }
+//        println(sessionController.editFilmId(sessionId, newFilmId))
+//    }
+
+    private fun showAvailableSeats() {
+        println("Current sessions:")
+        if(!showAllSessions())
             return
-        }
 
-        print("Input the Id of the new film: ")
-        val newFilmId = getIntegerFromUser()
+        val sessionId = getSessionId()
 
-        if (newFilmId == null) {
-            println("Incorrect format of Id provided")
-            return
-        }
-        println(sessionController.editFilmId(sessionId, newFilmId))
-    }
-
-    private fun showAvailableSeats(sessionId: Int?) {
         if (sessionId == null) {
             println("Incorrect session Id")
             return
@@ -265,7 +334,7 @@ class ConsoleMenuManager(
             val (datePart, timePart) = timeString.split(" ")
             val (day, month, year) = datePart.split(".").map { s -> s.toInt() }
             val (hours, minutes) = timePart.split(":").map { s -> s.toInt() }
-            //LocalDateTime.parse(timeString)
+
             LocalDateTime(
                 year = year,
                 monthNumber = month,
@@ -276,5 +345,37 @@ class ConsoleMenuManager(
         } catch (ex: Exception) {
             null
         }
+    }
+
+
+    private fun showAllSessions() : Boolean {
+
+        val allSessionsString = sessionController.getAllSessions().message
+        if(allSessionsString.isBlank()) {
+            println("There are no sessions")
+            return false
+        }
+        println(allSessionsString)
+        return true
+    }
+
+    private fun showAllFilms() : Boolean{
+        val allFilmsString = filmController.getAllFilms().message
+        if(allFilmsString.isBlank()) {
+            println("There is no information on films")
+            return false
+        }
+        println(allFilmsString)
+        return true
+    }
+
+    private fun showAllTickets(sessionId: Int) : Boolean {
+        val allTicketsString = sessionController.getAllTickets(sessionId).message
+        if(allTicketsString.isBlank()) {
+            println("There are no sold tickets")
+            return false
+        }
+        println(allTicketsString)
+        return true
     }
 }

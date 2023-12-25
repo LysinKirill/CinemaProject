@@ -12,7 +12,7 @@ class RuntimeSessionDao : SessionDao {
         return sessions[sessionId]
     }
 
-    override fun getAllSession(): List<SessionEntity> {
+    override fun getAllSessions(): List<SessionEntity> {
         return sessions.values.toList()
     }
 

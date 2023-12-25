@@ -1,7 +1,7 @@
 package presentation.model
 
 data class OutputModel(
-    private val message: String,
+    val message: String,
 ) {
     override fun toString(): String {
         return message
