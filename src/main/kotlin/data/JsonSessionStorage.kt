@@ -14,7 +14,7 @@ class JsonSessionStorage(private val jsonStoragePath: String) : SessionDao {
             if (storageFileText.isBlank()) listOf() else Json.decodeFromString(storageFileText)
         val updatedSessions = storedSessions.toMutableList()
 
-        updatedSessions.removeIf {oldSession -> oldSession.sessionId == session.sessionId}
+        updatedSessions.removeIf { oldSession -> oldSession.sessionId == session.sessionId }
         updatedSessions.add(session)
         val serializedUpdatedStorage = Json.encodeToString(updatedSessions.toList())
         writeTextToFile(jsonStoragePath, serializedUpdatedStorage)
@@ -25,7 +25,7 @@ class JsonSessionStorage(private val jsonStoragePath: String) : SessionDao {
         val storedSessions: List<SessionEntity> =
             if (storageFileText.isBlank()) listOf() else Json.decodeFromString(storageFileText)
 
-        return storedSessions.find {session ->  session.sessionId == sessionId}
+        return storedSessions.find { session -> session.sessionId == sessionId }
     }
 
     override fun getAllSessions(): List<SessionEntity> {
@@ -41,7 +41,7 @@ class JsonSessionStorage(private val jsonStoragePath: String) : SessionDao {
         val updatedSessions = storedSessions.toMutableList()
 
         for (session in listAccount) {
-            updatedSessions.removeIf {savedSession -> savedSession.sessionId == session.sessionId }
+            updatedSessions.removeIf { savedSession -> savedSession.sessionId == session.sessionId }
             updatedSessions.add(session)
         }
         val serializedUpdatedStorage = Json.encodeToString(updatedSessions.toList())

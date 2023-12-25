@@ -13,7 +13,7 @@ object DI {
     private const val TICKET_STORAGE_PATH = "src/main/resources/ticket_storage.json"
     private const val EMPLOYEE_STORAGE_PATH = "src/main/resources/employee_storage.json"
 
-    private val employeeDao : EmployeeDao by lazy {
+    private val employeeDao: EmployeeDao by lazy {
         JsonEmployeeStorage(EMPLOYEE_STORAGE_PATH)
     }
 
@@ -25,34 +25,34 @@ object DI {
         JsonFilmStorage(FILM_STORAGE_PATH)
     }
 
-    private val ticketDao : TicketDao by lazy {
+    private val ticketDao: TicketDao by lazy {
         JsonTicketStorage(TICKET_STORAGE_PATH)
     }
 
-    val authorizationController : AuthorizationContoller
+    private val authorizationController: AuthorizationContoller
         get() = AuthorizationControllerImpl(employeeDao)
-    val sessionController : SessionController
+    private val sessionController: SessionController
         get() = SessionControllerImpl(sessionDao, filmDao, ticketDao)
 
-    val filmController : FilmController
+    private val filmController: FilmController
         get() = FilmControllerImpl(filmDao)
 
-    val ticketService : TicketService
+    private val ticketService: TicketService
         get() = TicketServiceImpl(sessionDao, ticketDao)
 
-    val consoleMenuManager : MenuManager<MenuOption>
+    val consoleMenuManager: MenuManager<MenuOption>
         get() = ConsoleMenuManager(filmController, sessionController, ticketService)
 
 
-    val authorizationMenuManager : MenuManager<AuthorizationMenuOption>
+    val authorizationMenuManager: MenuManager<AuthorizationMenuOption>
         get() = AuthorizationMenuManager(authorizationController)
 
     val cinemaHallSeats: List<List<SeatState>>
         get() {
             val listOfRows = ArrayList<ArrayList<SeatState>>(CINEMA_ROW_COUNT)
-            for(i in 0..<CINEMA_ROW_COUNT) {
+            for (i in 0..<CINEMA_ROW_COUNT) {
                 listOfRows.add(ArrayList(ROW_SEAT_COUNT))
-                for(j in 0..<ROW_SEAT_COUNT) {
+                for (j in 0..<ROW_SEAT_COUNT) {
                     listOfRows[i].add(SeatState.Available)
                 }
             }

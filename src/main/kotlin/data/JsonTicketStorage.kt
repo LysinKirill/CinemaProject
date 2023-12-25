@@ -23,7 +23,7 @@ class JsonTicketStorage(private val jsonStoragePath: String) : TicketDao {
         val storedTickets: List<TicketEntity> =
             if (storageFileText.isBlank()) listOf() else Json.decodeFromString(storageFileText)
 
-        return storedTickets.find {ticket ->  ticket.ticketId == ticketId}
+        return storedTickets.find { ticket -> ticket.ticketId == ticketId }
     }
 
     override fun removeTicket(ticketId: Int) {
@@ -31,7 +31,7 @@ class JsonTicketStorage(private val jsonStoragePath: String) : TicketDao {
         val storedTickets: List<TicketEntity> =
             if (storageFileText.isBlank()) listOf() else Json.decodeFromString(storageFileText)
         val updatedSessions = storedTickets.toMutableList()
-        updatedSessions.removeIf {ticket -> ticket.ticketId == ticketId}
+        updatedSessions.removeIf { ticket -> ticket.ticketId == ticketId }
 
         val serializedUpdatedStorage = Json.encodeToString(updatedSessions.toList())
         writeTextToFile(jsonStoragePath, serializedUpdatedStorage)

@@ -1,9 +1,10 @@
 package presentation
 
 import domain.AuthorizationContoller
-import kotlin.math.log
 
-class AuthorizationMenuManager (val authorizationController: AuthorizationContoller): MenuManager <AuthorizationMenuOption>{
+
+class AuthorizationMenuManager(private val authorizationController: AuthorizationContoller) :
+    MenuManager<AuthorizationMenuOption> {
     override fun showOptions() {
         print("Available authorization actions:\n")
         println("\t1: Login")
@@ -14,25 +15,27 @@ class AuthorizationMenuManager (val authorizationController: AuthorizationContol
         return readlnOrNull()?.let { parseAction(it) }
     }
 
-    override fun processRequest(request: AuthorizationMenuOption?) : AuthorizationMenuOption? {
+    override fun processRequest(request: AuthorizationMenuOption?): AuthorizationMenuOption? {
         when (request) {
             AuthorizationMenuOption.Login -> {
 
                 val response = login()
-                if(response) {
+                if (response) {
                     println("Authorization successful")
                     return AuthorizationMenuOption.LoggedIn
                 } else {
                     println("Authorization failed")
                 }
             }
+
             AuthorizationMenuOption.Register -> {
                 val registerResult = register()
-                if(registerResult)
+                if (registerResult)
                     println("Registration successful")
                 else
                     println("Register failed")
             }
+
             else -> println("Incorrect option...")
         }
 
@@ -50,7 +53,7 @@ class AuthorizationMenuManager (val authorizationController: AuthorizationContol
     }
 
 
-    fun login() : Boolean {
+    fun login(): Boolean {
 
         print("Input the username: ")
         val username = readlnOrNull() ?: return false
@@ -60,18 +63,17 @@ class AuthorizationMenuManager (val authorizationController: AuthorizationContol
         return authorizationController.login(username, userPassword)
     }
 
-    fun register() : Boolean {
+    fun register(): Boolean {
         print("Input the username: ")
         val username = readlnOrNull() ?: return false
-        if(username.isBlank())
-        {
+        if (username.isBlank()) {
             println("Username cannot be blank")
             return false
         }
 
         print("Input your password: ")
         val userPassword = readlnOrNull() ?: return false
-        if(username.isBlank()) {
+        if (username.isBlank()) {
             println("Password cannot be empty")
             return false
         }
@@ -84,9 +86,9 @@ class AuthorizationMenuManager (val authorizationController: AuthorizationContol
             if (userInput[0].isDigit()) {
                 val userInputInt = userInput.toInt()
 
-                if(userInputInt == 1)
+                if (userInputInt == 1)
                     return AuthorizationMenuOption.Login
-                if(userInputInt == 2)
+                if (userInputInt == 2)
                     return AuthorizationMenuOption.Register
             } else
                 return AuthorizationMenuOption.valueOf(userInput)

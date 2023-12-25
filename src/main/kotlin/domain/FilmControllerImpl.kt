@@ -2,7 +2,6 @@ package domain
 
 import data.FilmDao
 import domain.entitiy.FilmInfoEntity
-import domain.entitiy.TicketEntity
 import presentation.model.OutputModel
 
 class FilmControllerImpl(private val filmDao: FilmDao) : FilmController {
@@ -15,7 +14,7 @@ class FilmControllerImpl(private val filmDao: FilmDao) : FilmController {
 
     override fun editFilmName(filmId: Int, newName: String): OutputModel {
         val film = filmDao.getFilm(filmId) ?: return OutputModel("Film with id = $filmId not found")
-        if(newName.isBlank())
+        if (newName.isBlank())
             return OutputModel("Cannot assign an empty name to a film")
 
         filmDao.updateFilm(film.copy(name = newName))
@@ -24,7 +23,7 @@ class FilmControllerImpl(private val filmDao: FilmDao) : FilmController {
 
     override fun editFilmDuration(filmId: Int, newDurationInMinutes: Int): OutputModel {
         val film = filmDao.getFilm(filmId) ?: return OutputModel("Film with id = $filmId not found")
-        if(newDurationInMinutes <= 0)
+        if (newDurationInMinutes <= 0)
             return OutputModel("Duration of a film cannot be a negative number")
 
         filmDao.updateFilm(film.copy(durationInMinutes = newDurationInMinutes))
@@ -34,9 +33,9 @@ class FilmControllerImpl(private val filmDao: FilmDao) : FilmController {
     override fun getAllFilms(): OutputModel {
         val films = filmDao.getAllFilms()
 
-        if(films.isEmpty())
+        if (films.isEmpty())
             return OutputModel("")
         return OutputModel("List of all films:\n" +
-                films.joinToString("\n") { film -> "\tFilm with id = ${film.filmId}: (film title = ${film.name}, duration = ${film.durationInMinutes} minutes)"})
+                films.joinToString("\n") { film -> "\tFilm with id = ${film.filmId}: (film title = ${film.name}, duration = ${film.durationInMinutes} minutes)" })
     }
 }

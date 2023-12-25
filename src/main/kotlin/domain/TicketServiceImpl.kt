@@ -33,11 +33,12 @@ class TicketServiceImpl(
 
         ticketDao.addTicket(newTicket)
         val updatedSeatState = mutableListOf<MutableList<SeatState>>()
-        for(i in session.seats.indices)
+        for (i in session.seats.indices)
             updatedSeatState.add(session.seats[i].toMutableList())
         updatedSeatState[row - 1][seatNumber - 1] = SeatState.Sold
 
-        val updatedSession = session.copy(soldTicketIds = session.soldTicketIds.plus(newTicketId), seats = updatedSeatState)
+        val updatedSession =
+            session.copy(soldTicketIds = session.soldTicketIds.plus(newTicketId), seats = updatedSeatState)
 
         sessionDao.updateWithSessions(updatedSession)
         return OutputModel("Ticket with Id = $newTicketId successfully sold")
@@ -51,11 +52,12 @@ class TicketServiceImpl(
 
         ticketDao.removeTicket(ticketId)
         val updatedSeatState = mutableListOf<MutableList<SeatState>>()
-        for(i in session.seats.indices)
+        for (i in session.seats.indices)
             updatedSeatState.add(session.seats[i].toMutableList())
         updatedSeatState[ticket.row][ticket.seatNumber] = SeatState.Available
 
-        val updatedSession = session.copy(soldTicketIds = session.soldTicketIds.minus(ticketId), seats = updatedSeatState)
+        val updatedSession =
+            session.copy(soldTicketIds = session.soldTicketIds.minus(ticketId), seats = updatedSeatState)
 
         sessionDao.updateWithSessions(updatedSession)
         return OutputModel("Ticket with Id = $ticketId successfully revoked")

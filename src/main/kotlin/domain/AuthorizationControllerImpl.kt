@@ -26,9 +26,10 @@ class AuthorizationControllerImpl(private val employeeDao: EmployeeDao) : Author
         val hashedPassword = hashPassword(password)
         employeeDao.addEmployee(EmployeeEntity(username, hashedPassword))
     }
+
     override fun login(username: String, password: String): Boolean {
 
-        if(!employeeDao.getAllEmployees().any { employee -> employee.employeeUsername == username })
+        if (!employeeDao.getAllEmployees().any { employee -> employee.employeeUsername == username })
             return false
         val hashedPassword = hashPassword(password)
         val employee = employeeDao.getEmployee(username) ?: return false

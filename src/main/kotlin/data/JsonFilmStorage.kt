@@ -12,7 +12,7 @@ class JsonFilmStorage(private val jsonStoragePath: String) : FilmDao {
         val storedFilms: List<FilmInfoEntity> =
             if (storageFileText.isBlank()) listOf() else Json.decodeFromString(storageFileText)
 
-        return storedFilms.find {film ->  film.filmId == filmId}
+        return storedFilms.find { film -> film.filmId == filmId }
     }
 
     override fun addFilm(filmInfo: FilmInfoEntity) {
@@ -40,7 +40,7 @@ class JsonFilmStorage(private val jsonStoragePath: String) : FilmDao {
             if (storageFileText.isBlank()) listOf() else Json.decodeFromString(storageFileText)
         val updatedFilms = storedFilms.toMutableList()
 
-        updatedFilms.removeIf {savedFilm -> savedFilm.filmId == filmInfo.filmId }
+        updatedFilms.removeIf { savedFilm -> savedFilm.filmId == filmInfo.filmId }
         updatedFilms.add(filmInfo)
 
         val serializedUpdatedStorage = Json.encodeToString(updatedFilms.toList())

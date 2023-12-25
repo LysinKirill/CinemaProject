@@ -6,4 +6,5 @@ import kotlinx.serialization.Serializable
 data class FilmInfoEntity(
     val filmId: Int,
     val name: String,
-    val durationInMinutes: Int)
+    val durationInMinutes: Int
+)

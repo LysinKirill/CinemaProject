@@ -137,26 +137,27 @@ class SessionControllerImpl(
             ticketsList.add(ticket)
         }
 
-        if(ticketsList.isEmpty())
+        if (ticketsList.isEmpty())
             return OutputModel("")
         return OutputModel("List of tickets for the session with Id = $sessionId:\n" +
-                ticketsList.joinToString("\n") { ticket -> "\tTicket with id ${ticket.ticketId}: (Row = ${ticket.row}," +
-                        " Seat number = ${ticket.seatNumber}, Price = ${ticket.price})"})
+                ticketsList.joinToString("\n") { ticket ->
+                    "\tTicket with id ${ticket.ticketId}: (Row = ${ticket.row}," +
+                            " Seat number = ${ticket.seatNumber}, Price = ${ticket.price})"
+                })
     }
 
     override fun getAllSessions(): OutputModel {
 
         val sessions = sessionDao.getAllSessions()
-        if(sessions.isEmpty())
+        if (sessions.isEmpty())
             return OutputModel("")
         val stringBuilder = StringBuilder()
         stringBuilder.append("List of all the sessions:\n")
-        for(session in sessions) {
+        for (session in sessions) {
             try {
                 val filmInfo = filmDao.getFilm(session.sessionId) ?: continue
                 stringBuilder.append("\tSession with id ${session.sessionId}: (film title = ${filmInfo.name}, start time = ${session.startTime})\n")
-            }
-            catch (ex: Exception) {
+            } catch (ex: Exception) {
                 continue
             }
         }
