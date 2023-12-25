@@ -3,8 +3,7 @@ package di
 import data.*
 import domain.*
 import domain.entitiy.SeatState
-import presentation.ConsoleMenuManager
-import presentation.MenuManager
+import presentation.*
 
 object DI {
     private const val CINEMA_ROW_COUNT = 10
@@ -12,21 +11,26 @@ object DI {
     private const val SESSION_STORAGE_PATH = "src/main/resources/session_storage.json"
     private const val FILM_STORAGE_PATH = "src/main/resources/film_storage.json"
     private const val TICKET_STORAGE_PATH = "src/main/resources/ticket_storage.json"
+    private const val EMPLOYEE_STORAGE_PATH = "src/main/resources/employee_storage.json"
+
+    private val employeeDao : EmployeeDao by lazy {
+        JsonEmployeeStorage(EMPLOYEE_STORAGE_PATH)
+    }
 
     private val sessionDao: SessionDao by lazy {
-        //RuntimeSessionDao()
         JsonSessionStorage(SESSION_STORAGE_PATH)
     }
 
     private val filmDao: FilmDao by lazy {
         JsonFilmStorage(FILM_STORAGE_PATH)
-        //RuntimeFilmDao()
     }
 
     private val ticketDao : TicketDao by lazy {
-        //RuntimeTicketDao()
         JsonTicketStorage(TICKET_STORAGE_PATH)
     }
+
+    val authorizationController : AuthorizationContoller
+        get() = AuthorizationControllerImpl(employeeDao)
     val sessionController : SessionController
         get() = SessionControllerImpl(sessionDao, filmDao, ticketDao)
 
@@ -36,10 +40,12 @@ object DI {
     val ticketService : TicketService
         get() = TicketServiceImpl(sessionDao, ticketDao)
 
-    val consoleMenuManager : MenuManager
+    val consoleMenuManager : MenuManager<MenuOption>
         get() = ConsoleMenuManager(filmController, sessionController, ticketService)
-    //get() = ConsoleMenuManager(filmDao, sessionDao, ticketDao, filmController, sessionController, ticketService)
 
+
+    val authorizationMenuManager : MenuManager<AuthorizationMenuOption>
+        get() = AuthorizationMenuManager(authorizationController)
 
     val cinemaHallSeats: List<List<SeatState>>
         get() {

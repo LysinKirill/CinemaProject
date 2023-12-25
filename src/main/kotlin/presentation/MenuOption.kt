@@ -11,5 +11,5 @@ enum class MenuOption {
     EditSessionFilm,
     SellTicket,
     ReturnTicket,
-    Exit
+    Exit,
 }

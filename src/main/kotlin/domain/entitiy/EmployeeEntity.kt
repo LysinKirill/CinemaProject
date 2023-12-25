@@ -1,4 +1,6 @@
 package domain.entitiy
 
-data class EmployeeEntity (val employeeId: Long, val firstName: String) {
-}
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class EmployeeEntity(val employeeUsername: String, val hashedPassword: String)

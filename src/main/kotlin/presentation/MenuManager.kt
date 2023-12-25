@@ -1,8 +1,8 @@
 package presentation
 
-interface MenuManager {
+interface MenuManager <T>{
     fun showOptions()
-    fun getRequest() : MenuOption?
-    fun processRequest(request: MenuOption?)
+    fun getRequest() : T?
+    fun processRequest(request: T?) : T?
     fun handleInteractions()
 }

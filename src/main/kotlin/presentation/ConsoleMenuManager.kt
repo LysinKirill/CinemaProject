@@ -5,14 +5,13 @@ import domain.FilmController
 import domain.SessionController
 import domain.TicketService
 import kotlinx.datetime.LocalDateTime
-import presentation.model.OutputModel
 import kotlin.Exception
 
 class ConsoleMenuManager(
     private val filmController: FilmController,
     private val sessionController: SessionController,
     private val ticketService: TicketService
-) : MenuManager {
+) : MenuManager<MenuOption> {
     override fun showOptions() {
         print("Available actions:\n\t")
         println(MenuOption.entries.mapIndexed { index, menuAction -> "${index + 1}. $menuAction" }.joinToString("\n\t"))
@@ -22,7 +21,7 @@ class ConsoleMenuManager(
         return readlnOrNull()?.let { parseAction(it) }
     }
 
-    override fun processRequest(request: MenuOption?) {
+    override fun processRequest(request: MenuOption?) : MenuOption? {
         when (request) {
             MenuOption.SellTicket -> sellTicket()
             MenuOption.ReturnTicket -> returnTicket()
@@ -34,9 +33,10 @@ class ConsoleMenuManager(
             MenuOption.EditSessionFilm -> editFilmName()
             MenuOption.MarkOccupiedSeat -> markOccupiedSeat()
             MenuOption.CreateSession -> createSession()
-            MenuOption.Exit -> return
+            MenuOption.Exit -> return MenuOption.Exit
             else -> println("Unhandled option...")
         }
+        return request
     }
 
     override fun handleInteractions() {
@@ -273,27 +273,6 @@ class ConsoleMenuManager(
         }
         println(sessionController.editSessionStartTime(sessionId, newStartTime))
     }
-
-//    private fun editSessionFilm() {
-//        println("Current sessions:")
-//        if(!showAllSessions())
-//            return
-//
-//        val sessionId = getSessionId()
-//        if (sessionId == null) {
-//            println("Incorrect session Id")
-//            return
-//        }
-//
-//        print("Input the Id of the new film: ")
-//        val newFilmId = getIntegerFromUser()
-//
-//        if (newFilmId == null) {
-//            println("Incorrect format of Id provided")
-//            return
-//        }
-//        println(sessionController.editFilmId(sessionId, newFilmId))
-//    }
 
     private fun showAvailableSeats() {
         println("Current sessions:")
